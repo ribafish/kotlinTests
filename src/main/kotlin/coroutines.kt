@@ -1,11 +1,15 @@
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.system.exitProcess
 import kotlin.system.measureTimeMillis
 
 fun main() {
-    testSharingFlow()
+//    testSharingFlow()
+    checkWithPrevious()
+    testSuspendCoroutine()
 }
 
 
@@ -54,6 +58,9 @@ fun coroutinesAsyncTest() = runBlocking {
 }
 
 fun testSharingFlow(): Nothing = runBlocking {
+    println("\n--------------------------")
+    println("testSharingFlow")
+    println("--------------------------\n")
 //    val _flow = MutableSharedFlow<String>(replay = 64)
 //    val flow = _flow.onEach {
 //        _flow.resetReplayCache()
@@ -92,4 +99,59 @@ fun testSharingFlow(): Nothing = runBlocking {
 
     delay(100)
     exitProcess(0)
+}
+
+fun testSuspendCoroutine() {
+    println("\n--------------------------")
+    println("testSuspendCoroutine")
+    println("--------------------------\n")
+    suspend fun doStuff(i: Int, mapper: (Int) -> String) =
+        suspendCoroutine { continuation ->
+            continuation.resume(mapper(i))
+        }
+
+    suspend fun initStuff() {
+        doStuff(1) {
+            throw IllegalArgumentException("WOoo")
+        }
+    }
+
+
+
+    runBlocking{
+        try {
+            initStuff()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}
+
+fun <T: Any> Flow<T>.withPrevious(): Flow<Pair<T?, T>> = flow {
+    var prev: T? = null
+    this@withPrevious.collect {
+        emit(prev to it)
+        prev = it
+    }
+}
+
+fun checkWithPrevious() {
+    println("\n--------------------------")
+    println("checkWithPrevious")
+    println("--------------------------\n")
+    val flow = flow {
+        for (i in 1..10) {
+            println("emit $i")
+            emit(i)
+        }
+    }
+
+    runBlocking {
+        flow
+            .withPrevious()
+            .map { (it.first ?: 0) + it.second }
+            .collect{
+                println("Collect $it")
+            }
+    }
 }

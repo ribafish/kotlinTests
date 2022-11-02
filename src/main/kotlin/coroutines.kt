@@ -5,11 +5,13 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.system.exitProcess
 import kotlin.system.measureTimeMillis
+import kotlin.time.Duration.Companion.seconds
 
 fun main() {
 //    testSharingFlow()
-    checkWithPrevious()
-    testSuspendCoroutine()
+//    checkWithPrevious()
+//    testSuspendCoroutine()
+    testSuspendCoroutine2()
 }
 
 
@@ -127,15 +129,29 @@ fun testSuspendCoroutine() {
     }
 }
 
-fun <T: Any> Flow<T>.withPrevious(): Flow<Pair<T?, T>> = flow {
-    var prev: T? = null
-    this@withPrevious.collect {
-        emit(prev to it)
-        prev = it
+fun testSuspendCoroutine2() {
+    runBlocking {
+        val i = withTimeout(3.seconds) {
+            suspendCoroutine { continuation ->
+                runBlocking {
+                    delay(5_000)
+                    continuation.resume(1)
+                }
+            }
+        }
+        println("i=$i")
     }
 }
 
 fun checkWithPrevious() {
+    fun <T: Any> Flow<T>.withPrevious(): Flow<Pair<T?, T>> = flow {
+        var prev: T? = null
+        this@withPrevious.collect {
+            emit(prev to it)
+            prev = it
+        }
+    }
+
     println("\n--------------------------")
     println("checkWithPrevious")
     println("--------------------------\n")

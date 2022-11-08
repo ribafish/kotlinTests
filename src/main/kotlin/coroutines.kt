@@ -1,6 +1,7 @@
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.system.exitProcess
@@ -11,11 +12,12 @@ fun main() {
 //    testSharingFlow()
 //    checkWithPrevious()
 //    testSuspendCoroutine()
-    testSuspendCoroutine2()
+//    testSuspendCoroutine2()
+    testFlowDispatchers()
 }
 
 
-val f1 = flowOf(1,3,4).onEach { delay(100) }
+val f1 = flowOf(1, 3, 4).onEach { delay(100) }
     .flowOn(Dispatchers.Default)
 val f2 = flowOf("a", "b", "c").onEach { delay(150) }
     .flowOn(Dispatchers.Default)
@@ -120,7 +122,7 @@ fun testSuspendCoroutine() {
 
 
 
-    runBlocking{
+    runBlocking {
         try {
             initStuff()
         } catch (e: Exception) {
@@ -144,7 +146,7 @@ fun testSuspendCoroutine2() {
 }
 
 fun checkWithPrevious() {
-    fun <T: Any> Flow<T>.withPrevious(): Flow<Pair<T?, T>> = flow {
+    fun <T : Any> Flow<T>.withPrevious(): Flow<Pair<T?, T>> = flow {
         var prev: T? = null
         this@withPrevious.collect {
             emit(prev to it)
@@ -166,8 +168,50 @@ fun checkWithPrevious() {
         flow
             .withPrevious()
             .map { (it.first ?: 0) + it.second }
-            .collect{
+            .collect {
                 println("Collect $it")
             }
+    }
+}
+
+fun testFlowDispatchers() = runBlocking {
+    fun Thread.printThread(msg: String): Thread = this.also { println("Doing '$msg' on thread id $id -> $name") }
+    Thread.currentThread().printThread("runBlocking")
+
+    suspend fun getCurrentThreadId(): Long {
+        delay(200)
+        return Thread.currentThread().let {
+            it.printThread("getCurrentThreadId").id
+        }
+    }
+
+    val flow = flow {
+        println("Flow start")
+        getCurrentThreadId()
+        println("Doing emit..")
+        emit(getCurrentThreadId())
+        println("Flow end")
+    }
+
+    val currentThreadId = getCurrentThreadId()
+
+    suspend fun Flow<Long>.collectAndCheck(msg: String) = this.collect {
+        println("Collect emit with '$msg', thread id is main/current thread: ${it == currentThreadId}")
+    }
+
+    println("\n--------------------------")
+    println("Starting collections")
+    println("--------------------------\n")
+
+    flow.collectAndCheck("just collect")
+    println("--------------------------\n")
+    flow.flowOn(Dispatchers.Unconfined).collectAndCheck("flowOn Unconfined")
+    println("--------------------------\n")
+    withContext(Dispatchers.Default) {
+        flow.collectAndCheck("withContext Default")
+    }
+    println("--------------------------\n")
+    withContext(Dispatchers.Default) {
+        flow.flowOn(Dispatchers.Unconfined).collectAndCheck("withContext Default + flowOn Unconfined")
     }
 }

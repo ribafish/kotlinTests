@@ -1,6 +1,8 @@
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -13,7 +15,8 @@ fun main() {
 //    checkWithPrevious()
 //    testSuspendCoroutine()
 //    testSuspendCoroutine2()
-    testFlowDispatchers()
+//    testFlowDispatchers()
+    testCallbackFlow()
 }
 
 
@@ -213,5 +216,25 @@ fun testFlowDispatchers() = runBlocking {
     println("--------------------------\n")
     withContext(Dispatchers.Default) {
         flow.flowOn(Dispatchers.Unconfined).collectAndCheck("withContext Default + flowOn Unconfined")
+    }
+}
+
+fun testCallbackFlow() = runBlocking {
+    val f1 = callbackFlow<Int> {
+        awaitClose { println("Close callback flow") }
+    }
+    val f = flow {
+        emit(1)
+        emitAll(f1)
+    }
+
+    try {
+        withTimeout(5000) {
+            f.collect {
+                println("collect: $it")
+            }
+        }
+    } catch (e: TimeoutCancellationException) {
+        println("Cancelled after 5s")
     }
 }

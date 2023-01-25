@@ -138,9 +138,9 @@ fun test1() {
 }
 
 fun test2() {
-    val ch = Channel<Int>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST).also { it.trySend(0) }
+    val ch = Channel<Int>(capacity = 0, onBufferOverflow = BufferOverflow.DROP_OLDEST).also { it.trySend(0) }
     val state = MutableStateFlow(0)
-    val shared = MutableSharedFlow<Int>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST).also { it.tryEmit(0) }
+    val shared = MutableSharedFlow<Int>(replay = 0,  extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST).also { it.tryEmit(0) }
 
     fun send(i: Int) {
         println("Sending $i")

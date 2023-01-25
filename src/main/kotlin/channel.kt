@@ -4,6 +4,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlin.system.exitProcess
 
+fun main() {
+//    test1()
+    test2()
+}
+
 data class State(val transactions: List<Int>, val state: String)
 
 var transactionsChannel: Channel<List<Int>>? = null
@@ -94,7 +99,7 @@ suspend fun CoroutineScope.collectStateFlow(): Job {
     }
 }
 
-fun main() {
+fun test1() {
     runBlocking {
 
         val j1 = collectStateFlow()
@@ -130,4 +135,68 @@ fun main() {
         delay(100)
         exitProcess(0)
     }
+}
+
+fun test2() {
+    val ch = Channel<Int>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST).also { it.trySend(0) }
+    val state = MutableStateFlow(0)
+    val shared = MutableSharedFlow<Int>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST).also { it.tryEmit(0) }
+
+    fun send(i: Int) {
+        println("Sending $i")
+        ch.trySend(i)
+        state.tryEmit(i)
+        shared.tryEmit(i)
+    }
+
+    suspend fun CoroutineScope.collectAll(): Job {
+        println("collectAll")
+        return launch(Dispatchers.Unconfined) {
+            listOf(
+                ch.receiveAsFlow() to "Channel",
+                state to "StateFlow",
+                shared to "SharedFlow"
+            ).forEach { (flow, name) ->
+                launch {
+                    flow.onCompletion {
+                        println("$name -> Completion: $it")
+                    }
+                        .onEmpty {
+                            println("$name -> Empty")
+                        }
+                        .onStart {
+                            println("$name -> Start")
+                        }
+                        .catch {
+                            println("$name -> Error: $it")
+                        }
+                        .collect {
+                            println("$name -> Collect $it")
+                        }
+                }
+            }
+        }
+    }
+
+    runBlocking {
+        val j1 = collectAll()
+
+        send(1)
+        send(2)
+
+        j1.cancel()
+
+        send(3)
+        send(4)
+
+        val j2 = collectAll()
+
+        send(5)
+        send(6)
+
+        j2.cancel()
+
+        send(7)
+    }
+
 }

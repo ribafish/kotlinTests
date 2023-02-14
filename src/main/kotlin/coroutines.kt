@@ -16,7 +16,8 @@ fun main() {
 //    testSuspendCoroutine()
 //    testSuspendCoroutine2()
 //    testFlowDispatchers()
-    testCallbackFlow()
+//    testCallbackFlow()
+    testCancellation()
 }
 
 
@@ -237,4 +238,43 @@ fun testCallbackFlow() = runBlocking {
     } catch (e: TimeoutCancellationException) {
         println("Cancelled after 5s")
     }
+}
+
+
+fun testCancellation() = runBlocking {
+    suspend fun runLongOp() {
+        delay(500)
+        println("Got to the end after 500ms")
+    }
+
+    println("Starting job1")
+    val j1 = launch {
+        runLongOp()
+    }
+
+    delay(200)
+
+    j1.cancel()
+    println("Cancelled job1 after 200ms")
+
+    delay(500)
+
+    println("-----------------")
+    println("Starting job2")
+
+    val j2 = launch {
+        runBlocking {
+            runLongOp()
+        }
+    }
+
+    delay(200)
+
+    j2.cancel()
+    println("Cancelled job2 after 200ms")
+
+    delay(500)
+    println("End test after additional 500ms")
+
+
 }

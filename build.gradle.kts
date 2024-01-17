@@ -1,9 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.7.20"
-    kotlin("plugin.serialization") version "1.7.20"
+    kotlin("jvm") version "2.0.0-Beta2"
+    kotlin("plugin.serialization") version "2.0.0-Beta2"
     application
+    id("com.github.ben-manes.versions") version "0.50.0"
 }
 
 group = "me.gasperkojek"
@@ -14,21 +15,21 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.0-Beta2")
 
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
 
-    implementation("com.jakewharton.threetenabp:threetenabp:1.4.2")
-    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("com.jakewharton.threetenabp:threetenabp:1.4.6")
+    implementation("com.google.code.gson:gson:2.10.1")
 
-    implementation("org.jgrapht:jgrapht-core:1.5.1")
+    implementation("org.jgrapht:jgrapht-core:1.5.2")
 
     testImplementation(kotlin("test-junit5"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
 }
 
 tasks.test {
@@ -36,9 +37,10 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "17"
 }
 
 application {
-    mainClassName = "MainKt"
+    mainClass.set("MainKt")
 }
+

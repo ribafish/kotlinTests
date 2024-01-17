@@ -1,4 +1,5 @@
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
@@ -11,7 +12,7 @@ import kotlin.system.measureTimeMillis
 import kotlin.time.Duration.Companion.seconds
 
 fun main() {
-//    testSharingFlow()
+    testSharingFlow()
 //    checkWithPrevious()
 //    testSuspendCoroutine()
 //    testSuspendCoroutine2()
@@ -69,12 +70,12 @@ fun testSharingFlow(): Nothing = runBlocking {
     println("\n--------------------------")
     println("testSharingFlow")
     println("--------------------------\n")
-//    val _flow = MutableSharedFlow<String>(replay = 64)
+    val flow = MutableSharedFlow<String>()
 //    val flow = _flow.onEach {
 //        _flow.resetReplayCache()
-//    }
-    val channel = Channel<String>(capacity = 64)
-    val flow = channel.receiveAsFlow()
+////    }
+//    val channel = Channel<String>(capacity = 64)
+//    val flow = channel.receiveAsFlow()
 
     suspend fun collect() = launch(Dispatchers.Default) {
         flow.collect {
@@ -85,24 +86,32 @@ fun testSharingFlow(): Nothing = runBlocking {
     suspend fun emit5(dif: String) {
         println("Emit 5 -> $dif")
         for (i in 1..5) {
-            delay(100)
-            channel.send("$dif $i")
-//            _flow.emit("$dif $i")
+//            delay(100)
+//            channel.send("$dif $i")
+            withTimeout(10) {
+                flow.emit("$dif $i")
+            }
         }
     }
 
     emit5("A")
 
     val job1 = collect()
-//    emit5("B")
+    emit5("B")
     delay(100)
     job1.cancel()
 
     emit5("C")
+    delay(1000)
 
     val job2 = collect()
     emit5("D")
     job2.cancel()
+
+    val flow2 = MutableSharedFlow<String>()
+        withTimeout(1) {
+            flow2.emit("Should die")
+        }
 
 
     delay(100)

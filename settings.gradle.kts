@@ -1,8 +1,8 @@
 pluginManagement {
     repositories {
-        maven {
-            url = uri("https://plugins.grdev.net/m2")
-        }
+//        maven {
+//            url = uri("https://plugins.grdev.net/m2")
+//        }
         gradlePluginPortal()
         mavenCentral()
         mavenLocal()
@@ -14,6 +14,8 @@ plugins {
     id("com.gradle.common-custom-user-data-gradle-plugin") version "1.13"
 }
 
+val isCI = System.getenv("CI") != null
+
 gradleEnterprise {
     allowUntrustedServer = false // ensure a trusted certificate is configured
 
@@ -22,6 +24,7 @@ gradleEnterprise {
     buildScan {
         capture { isTaskInputFiles = true }
         publishAlways()
+        isUploadInBackground = !isCI
     }
 }
 

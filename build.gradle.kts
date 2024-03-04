@@ -24,20 +24,27 @@ dependencies {
 
     implementation("com.jakewharton.threetenabp:threetenabp:1.4.6")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.12")
 
     implementation("org.jgrapht:jgrapht-core:1.5.2")
 
     testImplementation(kotlin("test-junit5"))
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
 }
 
 tasks.test {
     useJUnitPlatform()
+    systemProperties(mapOf(
+        "https.proxyHost" to "localhost",
+        "https.proxyPort" to "1080"
+    ))
 }
 
-tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "17"
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "11"
 }
 
 application {

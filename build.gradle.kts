@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.provider.inLenientMode
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -51,3 +52,27 @@ application {
     mainClass.set("MainKt")
 }
 
+// badConfig stuff is here to get a successful build with failed to resolve dependencies
+val badConfig by configurations.creating
+val badConfig2 by configurations.creating {
+    extendsFrom(configurations.compileClasspath.get())
+}
+
+dependencies {
+    badConfig("org.fake:does-not-exist:1")
+    badConfig2("org.fake:does-not-exist:2")
+}
+
+tasks.register("badConfigTask") {
+    doLast {
+        try {
+            badConfig.resolve().toString()
+        } catch (e: Exception) {
+            e.message
+        }
+        badConfig2.incoming.artifactView {
+            lenient(true)
+        }.files.files
+        configurations.compileClasspath.get().resolve()
+    }
+}

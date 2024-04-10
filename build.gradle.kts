@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.provider.inLenientMode
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -6,6 +5,7 @@ plugins {
     kotlin("plugin.serialization") version "2.0.0-Beta2"
     application
     id("com.github.ben-manes.versions") version "0.50.0"
+    id("groovy")
 }
 
 group = "me.gasperkojek"
@@ -28,6 +28,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.12")
 
     implementation("org.jgrapht:jgrapht-core:1.5.2")
+    implementation("org.codehaus.groovy:groovy-all:3.0.21")
+    implementation("org.codehaus.groovy:groovy-xml:3.0.21")
 
     testImplementation(kotlin("test-junit5"))
     testImplementation(platform("org.junit:junit-bom:5.10.2"))

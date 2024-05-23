@@ -16,7 +16,7 @@ plugins {
 }
 
 val isCI = System.getenv("CI") != null
-val exp="cache-exp-2"
+val exp="cache-exp-3"
 
 develocity {
     allowUntrustedServer = true // ensure a trusted certificate is configured

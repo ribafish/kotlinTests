@@ -15,25 +15,29 @@ plugins {
 }
 
 val isCI = System.getenv("CI") != null
+val exp="cache-exp-2"
 
 develocity {
     allowUntrustedServer = true // ensure a trusted certificate is configured
 
-    server = "https://ge.solutions-team.gradle.com/" // adjust to your Develocity server
+//    server = "https://ge.solutions-team.gradle.com/" // adjust to your Develocity server
+    server = "https://develocity-04b8b6f9.nip.io" // adjust to your Develocity server
 
     buildScan {
         uploadInBackground = !isCI
+        tag(exp)
     }
 }
 
 buildCache {
     local {
-        isEnabled = true
+        isEnabled = false
     }
 
     remote(develocity.buildCache) {
         isEnabled = true
-        isPush = false
+        isPush = true
+        path = "cache/$exp"
     }
 }
 

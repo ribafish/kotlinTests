@@ -16,13 +16,14 @@ plugins {
 }
 
 val isCI = System.getenv("CI") != null
-val exp="cache-exp-3"
+val exp="cache-exp-2"
 
 develocity {
     allowUntrustedServer = true // ensure a trusted certificate is configured
 
 //    server = "https://ge.solutions-team.gradle.com/" // adjust to your Develocity server
-    server = "https://develocity-04b8b6f9.nip.io" // adjust to your Develocity server
+//    server = "https://develocity-04b8b6f9.nip.io" // adjust to your Develocity server
+    server = "https://develocity-3308e4bb.nip.io" // adjust to your Develocity server
 
     buildScan {
         uploadInBackground = !isCI

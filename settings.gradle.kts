@@ -23,7 +23,7 @@ develocity {
 
 //    server = "https://ge.solutions-team.gradle.com/" // adjust to your Develocity server
 //    server = "https://develocity-04b8b6f9.nip.io" // adjust to your Develocity server
-    server = "https://develocity-3308e4bb.nip.io" // adjust to your Develocity server
+    server = "https://gradle-enterprise-228d301d.nip.io" // adjust to your Develocity server
 
     buildScan {
         uploadInBackground = !isCI

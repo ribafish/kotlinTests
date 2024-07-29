@@ -5,7 +5,10 @@ on: [ push, pull_request, workflow_dispatch ]
 jobs:
   verification:
     name: Verification
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner: [ ubuntu-latest, windows-latest ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,6 +20,6 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build run
         env:
           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}

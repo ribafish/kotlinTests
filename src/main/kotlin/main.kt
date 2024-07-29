@@ -9,8 +9,11 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @InternalCoroutinesApi
 fun main() {
     println("Hello, world!!!")
+    println("Getting GITHUB_ACTIONS env var: ${System.getenv("GITHUB_ACTIONS")}")
+    println(System.getenv())
 
     quickChecks()
+
 
 //    coroutinesTest()
 //    rxTests()

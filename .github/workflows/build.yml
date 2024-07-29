@@ -5,17 +5,48 @@ on: [ push, pull_request, workflow_dispatch ]
 jobs:
   verification:
     name: Verification
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        runner: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest, windows-latest, windows-2019]
+        shell: [ bash, pwsh, wsl-bash ]
+        java-version: [ '17' ]
+        exclude:
+          - os: ubuntu-latest
+            shell: pwsh
+          - os: ubuntu-latest
+            shell: wsl-bash
+          - os: windows-latest
+            shell: bash
+          - os: windows-2019
+            shell: bash
+    defaults:
+      run:
+        shell: ${{ matrix.shell }} {0}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up WSL
+        if: ${{ matrix.shell == 'wsl-bash'  }}
+        uses: Vampire/setup-wsl@v3
+        with:
+          distribution: Ubuntu-22.04
+          additional-packages: curl unzip wget apt-transport-https gnupg dos2unix
+      - name: Set up Gradle and JDK ${{ matrix.java-version }} on WSL
+        if: ${{ matrix.shell == 'wsl-bash'  }}
+        run: |
+          find . -type f -print0 | xargs -0 -n 1 -P 4 dos2unix
+          chmod +x gradlew
+          wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | sudo apt-key add -
+          echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | sudo tee /etc/apt/sources.list.d/adoptium.list
+          sudo apt-get update
+          sudo apt-get install -y temurin-${{ matrix.java-version }}-jdk
       - name: Set up Java
+        if: ${{ matrix.shell != 'wsl-bash' }}
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3

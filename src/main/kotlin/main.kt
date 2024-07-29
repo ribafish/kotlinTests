@@ -10,7 +10,8 @@ import kotlinx.coroutines.InternalCoroutinesApi
 fun main() {
     println("Hello, world!!!")
     println("Getting GITHUB_ACTIONS env var: ${System.getenv("GITHUB_ACTIONS")}")
-    println(System.getenv())
+    val envVars = System.getenv().entries.map { "\t$it" }.reduce { acc, it -> "$acc\n$it" }
+    println("Available env vars:\n$envVars\n")
 
     quickChecks()
 

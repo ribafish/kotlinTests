@@ -24,6 +24,8 @@ jobs:
     defaults:
       run:
         shell: ${{ matrix.shell }} {0}
+    env:
+      WSLENV: GITHUB_ACTIONS:GITHUB_SERVER_URL:GITHUB_REPOSITORY:GITHUB_RUN_ID:GITHUB_WORKFLOW:GITHUB_HEAD_REF:GRADLE_ENTERPRISE_ACCESS_KEY
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -1,6 +1,18 @@
 name: Verify Build
 
-on: [ push, pull_request, workflow_dispatch ]
+on:
+  push:
+      paths:
+        - "build.gradle"
+        - "settings.gradle"
+        - "gradle.properties"
+        - "gradle-wrapper.properties"
+        - "gradlew"
+        - "gradlew.bat"
+        - "src/**"
+        - ".github/workflows/build.yml"
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   verification:

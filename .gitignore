@@ -78,3 +78,6 @@ fabric.properties
 
 build
 /.gradle/
+.idea/**
+.idea/misc.xml
+.idea/modules.xml

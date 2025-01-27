@@ -3,10 +3,11 @@ name: Verify Build
 on:
   push:
       paths:
-        - "build.gradle"
-        - "settings.gradle"
+        - "build.gradle.kts"
+        - "settings.gradle.kts"
+        - "build.gradle.kts"
         - "gradle.properties"
-        - "gradle-wrapper.properties"
+        - "gradle/wrapper/**"
         - "gradlew"
         - "gradlew.bat"
         - "src/**"

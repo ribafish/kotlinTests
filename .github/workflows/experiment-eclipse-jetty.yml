@@ -40,6 +40,7 @@ jobs:
           develocityUrl: ${{ env.DEVELOCITY_URL }}
           failIfNotFullyCacheable: false
           enableDevelocity: true
+          enableGradleEnterprise: true
       - name: Run experiment 2
         uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-2@actions-stable
         if: matrix.experimentId == 2
@@ -52,3 +53,4 @@ jobs:
           develocityUrl: ${{ env.DEVELOCITY_URL }}
           failIfNotFullyCacheable: false
           enableDevelocity: true
+          enableGradleEnterprise: true

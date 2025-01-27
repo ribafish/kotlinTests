@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         goals:
-          - "install -DskipTests=true"
+          - "install -DskipTests=true -Dscan.tag.skipTests"
           - "verify"
         experimentId: [1, 2]
     runs-on: ubuntu-latest

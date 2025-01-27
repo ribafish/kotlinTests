@@ -2,10 +2,14 @@ name: Eclipse Jetty BVS Experiment
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/experiment-eclipse-jetty.yml"
 
 env:
   DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
   GIT_REPO: "https://github.com/jetty/jetty.project.git"
+  ARGS: "-Dscan.tag.gk-eclipse-exp"
 
 jobs:
   Experiment:

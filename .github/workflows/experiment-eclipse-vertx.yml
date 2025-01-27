@@ -1,14 +1,14 @@
-name: Eclipse JGit BVS Experiment
+name: Eclipse Vert.X BVS Experiment
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - ".github/workflows/experiment-eclipse-jgit.yml"
+      - ".github/workflows/experiment-eclipse-vertx.yml"
 
 env:
   DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
-  GIT_REPO: "https://github.com/eclipse-jgit/jgit.git"
+  GIT_REPO: "https://github.com/eclipse-vertx/vert.x.git"
   ARGS: "-Dscan.tag.gk-eclipse-exp"
 
 jobs:
@@ -17,8 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         goals:
-          - "install -DskipTests=true"
-          - "verify"
+          - "install"
+          - "package"
         experimentId: [1, 2]
     runs-on: ubuntu-latest
     steps:

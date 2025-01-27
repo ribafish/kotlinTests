@@ -1,14 +1,14 @@
-name: Eclipse JGit BVS Experiment
+name: Eclipse OpenMQ BVS Experiment
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - ".github/workflows/experiment-eclipse-jgit.yml"
+      - ".github/workflows/experiment-eclipse-openmq.yml"
 
 env:
   DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
-  GIT_REPO: "https://github.com/eclipse-jgit/jgit.git"
+  GIT_REPO: "https://github.com/eclipse-ee4j/openmq.git"
   ARGS: "-Dscan.tag.gk-eclipse-exp"
 
 jobs:
@@ -17,8 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         goals:
-          - "install -DskipTests=true"
-          - "verify"
+          - "install -DskipTests=true -Dscan.tag.skipTests"
+          - "install"
         experimentId: [1, 2]
     runs-on: ubuntu-latest
     steps:

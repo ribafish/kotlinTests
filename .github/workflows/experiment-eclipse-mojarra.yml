@@ -8,7 +8,8 @@ on:
 
 env:
   DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
-  GIT_REPO: "https://github.com/eclipse-ee4j/mojarra.git"
+#  GIT_REPO: "https://github.com/eclipse-ee4j/mojarra.git"
+  GIT_REPO: "eclipse-ee4j/mojarra"
   ARGS: "-Dscan.tag.gk-eclipse-exp"
 
 jobs:
@@ -32,6 +33,18 @@ jobs:
         with:
           downloadDevelopmentRelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout Sources
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.GIT_REPO }}
+          submodules: 'true'
+          path: './mojarra'
+      - name: Checkout API
+        uses: actions/checkout@v4
+        with:
+          repository: jakartaee/faces
+          ref: '5.0'
+          path: './mojarra/faces'
       - name: Run experiment 1
         uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-1@actions-stable
         if: matrix.experimentId == 1
@@ -39,7 +52,7 @@ jobs:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
           GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
         with:
-          gitRepo: ${{ env.GIT_REPO }}
+          gitRepo: 'file://$GITHUB_WORKSPACE/mojarra'
           goals: ${{ matrix.goals }}
           args: ${{ env.ARGS }}
           develocityUrl: ${{ env.DEVELOCITY_URL }}
@@ -54,7 +67,7 @@ jobs:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
           GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
         with:
-          gitRepo: ${{ env.GIT_REPO }}
+          gitRepo: 'file://$GITHUB_WORKSPACE/mojarra'
           goals: ${{ matrix.goals }}
           args: ${{ env.ARGS }}
           develocityUrl: ${{ env.DEVELOCITY_URL }}

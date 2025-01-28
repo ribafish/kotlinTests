@@ -9,7 +9,7 @@ on:
 env:
   DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
   GIT_REPO: "https://github.com/eclipse-ee4j/jersey.git"
-  ARGS: "-Dscan.tag.gk-eclipse-exp"
+  ARGS: "-Dscan.tag.gk-eclipse-exp -Dorg.slf4j.simpleLogger.log.develocity.goal.cache=debug"
 
 jobs:
   Experiment:

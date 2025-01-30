@@ -19,9 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         goals:
-          - "install -Pstaging -f mq/main -DskipTests=true -Dscan.tag.skipTests Dscan.tag.OpenMqMain"
+          - "install -Pstaging -f mq/main -DskipTests=true -Dscan.tag.skipTests"
           - "install -Pstaging"
-          - "install -Pstaging -f docs -Dscan.tag.OpenMqDocs"
+          - "install -Pstaging -f docs"
         experimentId: [1, 2]
     runs-on: ubuntu-latest
     steps:

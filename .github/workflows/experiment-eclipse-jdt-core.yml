@@ -19,7 +19,9 @@ jobs:
         goals:
           - "install -DskipTests=true -Dscan.tag.skipTests"
           - "install --batch-mode -f org.eclipse.jdt.core.compiler.batch -DlocalEcjVersion=99.99"
-          - "verify --batch-mode --fail-at-end -Ptest-on-javase-21 -Pbree-libs -Papi-check -Djava.io.tmpdir=$WORKSPACE/tmp -Dproject.build.sourceEncoding=UTF-8 -Dtycho.surefire.argLine='--add-modules ALL-SYSTEM -Dcompliance=1.8,11,17,20 -Djdt.performance.asserts=disabled' -Dcbi-ecj-version=99.99"
+#          - "verify --batch-mode --fail-at-end -Ptest-on-javase-21 -Pbree-libs -Papi-check -Djava.io.tmpdir=$WORKSPACE/tmp -Dproject.build.sourceEncoding=UTF-8 -Dtycho.surefire.argLine='--add-modules ALL-SYSTEM -Dcompliance=1.8,11,17,20 -Djdt.performance.asserts=disabled' -DlocalEcjVersion=99.99"
+          - "verify -Dscan.tag.justVerify"
+          - "verify --batch-mode --fail-at-end -Ptest-on-javase-21 -Pbree-libs -Papi-check -Dscan.value.profiles='test-on-javase-21,bree-libs,api-check'"
         experimentId: [1, 2]
     runs-on: ubuntu-latest
     steps:

@@ -28,6 +28,10 @@ jobs:
         with:
           java-version: 17
           distribution: "temurin"
+      - name: Set Node.js 14.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14.x
       - name: Set up test resources
         run: make compile-test-resources
       - name: Download latest version of the validation scripts

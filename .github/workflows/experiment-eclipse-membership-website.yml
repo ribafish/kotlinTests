@@ -28,6 +28,8 @@ jobs:
         with:
           java-version: 17
           distribution: "temurin"
+      - name: Set up test resources
+        run: make compile-test-resources
       - name: Download latest version of the validation scripts
         uses: gradle/develocity-build-validation-scripts/.github/actions/maven/download@actions-stable
         with:

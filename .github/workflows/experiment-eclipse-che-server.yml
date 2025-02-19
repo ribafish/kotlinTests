@@ -18,9 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         goals:
-          - "install -DskipTests=true -Dscan.tag.skipTests"
-          - "install"
-          - "install -Pintegration -Dscan.tag.integration"
+          - "install -DskipTests=true -Dscan.tag.skipTests -Dlicense.ignoreLastDate=true"
+          - "install -Dlicense.ignoreLastDate=true"
+          - "install -Pintegration -Dscan.tag.integration -Dlicense.ignoreLastDate=true"
         experimentId: [1, 2]
     runs-on: ubuntu-latest
     steps:

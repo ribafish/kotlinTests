@@ -8,7 +8,8 @@ on:
 
 env:
   DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
-  GIT_REPO: "https://github.com/eclipse-che/che-server.git"
+  GIT_REPO: "https://github.com/ribafish/eclipse-che-server.git"
+  BRANCH: "feature/develocityBuildCache"
   ARGS: "-Dscan.tag.gk-eclipse-exp"
 
 jobs:
@@ -47,8 +48,7 @@ jobs:
           args: ${{ env.ARGS }}
           develocityUrl: ${{ env.DEVELOCITY_URL }}
           failIfNotFullyCacheable: false
-          enableDevelocity: true
-          enableGradleEnterprise: true
+          gitBranch: ${{ env.BRANCH }}
       - name: Run experiment 2
         uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-2@actions-stable
         if: matrix.experimentId == 2
@@ -61,5 +61,4 @@ jobs:
           args: ${{ env.ARGS }}
           develocityUrl: ${{ env.DEVELOCITY_URL }}
           failIfNotFullyCacheable: false
-          enableDevelocity: true
-          enableGradleEnterprise: true
+          gitBranch: ${{ env.BRANCH }}

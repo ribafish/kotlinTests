@@ -1,0 +1,82 @@
+name: Eclipse TractusX EDC BVS Experiment
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/experiment-eclipse-tractusx-edc.yml"
+
+env:
+  DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
+  GIT_REPO: "https://github.com/eclipse-tractusx/tractusx-edc.git"
+  ARGS: "-Dscan.tag.gk-eclipse-exp"
+
+jobs:
+  Experiment:
+    strategy:
+      fail-fast: false
+      matrix:
+        tasks:
+          - "assemble"
+          - "build"
+          - "test"
+          - "javadoc"
+          - :edc-tests:runtime:mock-connector:dockerize test -DincludeTags="ComponentTest" -DincludeTags="ApiTest"
+        experimentId: [1, 2, 3]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: "temurin"
+      - name: Download latest version of the validation scripts
+        uses: gradle/develocity-build-validation-scripts/.github/actions/gradle/download@actions-stable
+        with:
+          downloadDevelopmentRelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run experiment 1
+        uses: gradle/develocity-build-validation-scripts/.github/actions/gradle/experiment-1@actions-stable
+        if: matrix.experimentId == 1
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.DV_SOLUTIONS_ACCESS_KEY }}"
+          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+        with:
+          gitRepo: ${{ env.GIT_REPO }}
+          tasks: ${{ matrix.tasks }}
+          args: ${{ env.ARGS }}
+          develocityUrl: ${{ env.DEVELOCITY_URL }}
+          projectDir: "server"
+          failIfNotFullyCacheable: false
+          enableDevelocity: true
+          enableGradleEnterprise: true
+      - name: Run experiment 2
+        uses: gradle/develocity-build-validation-scripts/.github/actions/gradle/experiment-2@actions-stable
+        if: matrix.experimentId == 2
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.DV_SOLUTIONS_ACCESS_KEY }}"
+          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+        with:
+          gitRepo: ${{ env.GIT_REPO }}
+          tasks: ${{ matrix.tasks }}
+          args: ${{ env.ARGS }}
+          develocityUrl: ${{ env.DEVELOCITY_URL }}
+          projectDir: "server"
+          failIfNotFullyCacheable: false
+          enableDevelocity: true
+          enableGradleEnterprise: true
+      - name: Run experiment 3
+        uses: gradle/develocity-build-validation-scripts/.github/actions/gradle/experiment-3@actions-stable
+        if: matrix.experimentId == 3
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.DV_SOLUTIONS_ACCESS_KEY }}"
+          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+        with:
+          gitRepo: ${{ env.GIT_REPO }}
+          tasks: ${{ matrix.tasks }}
+          args: ${{ env.ARGS }}
+          develocityUrl: ${{ env.DEVELOCITY_URL }}
+          projectDir: "server"
+          failIfNotFullyCacheable: false
+          enableDevelocity: true
+          enableGradleEnterprise: true

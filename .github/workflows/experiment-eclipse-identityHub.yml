@@ -1,10 +1,10 @@
-name: Eclipse Hawkbit BVS Experiment
+name: Eclipse IdentityHub BVS Experiment
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - ".github/workflows/experiment-eclipse-hawkbit.yml"
+      - ".github/workflows/experiment-eclipse-identityHub.yml"
 
 env:
   DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"

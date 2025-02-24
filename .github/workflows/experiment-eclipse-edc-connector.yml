@@ -1,4 +1,4 @@
-name: Eclipse OpenSVX Server BVS Experiment
+name: Eclipse EDC Connector BVS Experiment
 
 on:
   workflow_dispatch:

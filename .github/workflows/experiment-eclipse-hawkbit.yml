@@ -1,0 +1,72 @@
+name: Eclipse membership website BVS Experiment
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/experiment-eclipse-hawkbit.yml"
+
+env:
+  DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
+  GIT_REPO: "https://github.com/eclipse-hawkbit/hawkbit.git"
+  ARGS: "-Dscan.tag.gk-eclipse-exp"
+
+jobs:
+  Experiment:
+    strategy:
+      fail-fast: false
+      matrix:
+        goals:
+          - "compile package"
+          - "verify javadoc:javadoc --batch-mode"
+        experimentId: [1, 2]
+    runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:3-management-alpine
+        env:
+          RABBITMQ_DEFAULT_VHOST: /
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
+        ports:
+          - 15672:15672
+          - 5672:5672
+    steps:
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: "temurin"
+      - name: Download latest version of the validation scripts
+        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/download@actions-stable
+        with:
+          downloadDevelopmentRelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run experiment 1
+        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-1@actions-stable
+        if: matrix.experimentId == 1
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+        with:
+          gitRepo: ${{ env.GIT_REPO }}
+          goals: ${{ matrix.goals }}
+          args: ${{ env.ARGS }}
+          develocityUrl: ${{ env.DEVELOCITY_URL }}
+          failIfNotFullyCacheable: false
+          enableDevelocity: true
+          enableGradleEnterprise: true
+      - name: Run experiment 2
+        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-2@actions-stable
+        if: matrix.experimentId == 2
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+        with:
+          gitRepo: ${{ env.GIT_REPO }}
+          goals: ${{ matrix.goals }}
+          args: ${{ env.ARGS }}
+          develocityUrl: ${{ env.DEVELOCITY_URL }}
+          failIfNotFullyCacheable: false
+          enableDevelocity: true
+          enableGradleEnterprise: true

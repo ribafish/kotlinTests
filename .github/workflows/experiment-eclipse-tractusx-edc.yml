@@ -46,7 +46,6 @@ jobs:
           tasks: ${{ matrix.tasks }}
           args: ${{ env.ARGS }}
           develocityUrl: ${{ env.DEVELOCITY_URL }}
-          projectDir: "server"
           failIfNotFullyCacheable: false
           enableDevelocity: true
           enableGradleEnterprise: true
@@ -61,7 +60,6 @@ jobs:
           tasks: ${{ matrix.tasks }}
           args: ${{ env.ARGS }}
           develocityUrl: ${{ env.DEVELOCITY_URL }}
-          projectDir: "server"
           failIfNotFullyCacheable: false
           enableDevelocity: true
           enableGradleEnterprise: true
@@ -76,7 +74,6 @@ jobs:
           tasks: ${{ matrix.tasks }}
           args: ${{ env.ARGS }}
           develocityUrl: ${{ env.DEVELOCITY_URL }}
-          projectDir: "server"
           failIfNotFullyCacheable: false
           enableDevelocity: true
           enableGradleEnterprise: true

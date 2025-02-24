@@ -1,4 +1,4 @@
-name: Eclipse membership website BVS Experiment
+name: Eclipse Hawkbit BVS Experiment
 
 on:
   workflow_dispatch:

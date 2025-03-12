@@ -8,7 +8,9 @@ on:
 
 env:
   DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
-  GIT_REPO: "https://github.com/eclipse-collections/eclipse-collections.git"
+#  GIT_REPO: "https://github.com/eclipse-collections/eclipse-collections.git"
+  GIT_REPO: "https://github.com/ribafish/eclipse-collections.git"
+  BRANCH: "feature/develocity"
   ARGS: "-Dscan.tag.gk-eclipse-exp"
 
 jobs:
@@ -19,13 +21,15 @@ jobs:
         goals:
           - "install -DskipTests=true -Dscan.tag.skipTests"
           - "install"
+          - "verify checkstyle:check --activate-profiles all -DskipTests=true"
+          - "install --projects performance-tests --also-make --activate-profiles all -DskipTests=true -Dscan.tag.performanceTests"
         experimentId: [1, 2]
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: 11
           distribution: "temurin"
       - name: Download latest version of the validation scripts
         uses: gradle/develocity-build-validation-scripts/.github/actions/maven/download@actions-stable
@@ -43,9 +47,10 @@ jobs:
           goals: ${{ matrix.goals }}
           args: ${{ env.ARGS }}
           develocityUrl: ${{ env.DEVELOCITY_URL }}
+          gitBranch: ${{ env.BRANCH }}
           failIfNotFullyCacheable: false
-          enableDevelocity: true
-          enableGradleEnterprise: true
+          enableDevelocity: false
+          enableGradleEnterprise: false
       - name: Run experiment 2
         uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-2@actions-stable
         if: matrix.experimentId == 2
@@ -57,6 +62,7 @@ jobs:
           goals: ${{ matrix.goals }}
           args: ${{ env.ARGS }}
           develocityUrl: ${{ env.DEVELOCITY_URL }}
+          gitBranch: ${{ env.BRANCH }}
           failIfNotFullyCacheable: false
-          enableDevelocity: true
-          enableGradleEnterprise: true
+          enableDevelocity: false
+          enableGradleEnterprise: false

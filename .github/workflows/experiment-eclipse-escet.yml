@@ -39,33 +39,51 @@ jobs:
         with:
           downloadDevelopmentRelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set up Xvfb
-        run: |
-          export DISPLAY=:99
-          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1
-      - name: Run experiment 1
-        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-1@actions-stable
+      - name: Set up Xvfb and run experiment 1
         if: matrix.experimentId == 1
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
           GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
-        with:
-          gitRepo: ${{ env.GIT_REPO }}
-          goals: ${{ matrix.goals }}
-          args: ${{ env.ARGS }}
-          develocityUrl: ${{ env.DEVELOCITY_URL }}
-          failIfNotFullyCacheable: false
-          gitBranch: ${{ env.BRANCH }}
-      - name: Run experiment 2
-        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-2@actions-stable
+        shell: bash
+        run: |
+          cd develocity-maven-build-validation
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          ./01-validate-local-build-caching-same-location.sh -r ${{ env.GIT_REPO }} -g "${{ matrix.goals }}" -a "${{ env.ARGS }}" -s ${{ env.DEVELOCITY_URL }} -b ${{ env.BRANCH }}
+      - name: Set up Xvfb and run experiment 2
         if: matrix.experimentId == 2
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
           GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
-        with:
-          gitRepo: ${{ env.GIT_REPO }}
-          goals: ${{ matrix.goals }}
-          args: ${{ env.ARGS }}
-          develocityUrl: ${{ env.DEVELOCITY_URL }}
-          failIfNotFullyCacheable: false
-          gitBranch: ${{ env.BRANCH }}
+        shell: bash
+        run: |
+          cd develocity-maven-build-validation
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          ./02-validate-local-build-caching-different-locations.sh -r ${{ env.GIT_REPO }} -g "${{ matrix.goals }}" -a "${{ env.ARGS }}" -s ${{ env.DEVELOCITY_URL }} -b ${{ env.BRANCH }}
+#      - name: Run experiment 1
+#        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-1@actions-stable
+#        if: matrix.experimentId == 1
+#        env:
+#          DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+#          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+#        with:
+#          gitRepo: ${{ env.GIT_REPO }}
+#          goals: ${{ matrix.goals }}
+#          args: ${{ env.ARGS }}
+#          develocityUrl: ${{ env.DEVELOCITY_URL }}
+#          failIfNotFullyCacheable: false
+#          gitBranch: ${{ env.BRANCH }}
+#      - name: Run experiment 2
+#        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-2@actions-stable
+#        if: matrix.experimentId == 2
+#        env:
+#          DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+#          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+#        with:
+#          gitRepo: ${{ env.GIT_REPO }}
+#          goals: ${{ matrix.goals }}
+#          args: ${{ env.ARGS }}
+#          develocityUrl: ${{ env.DEVELOCITY_URL }}
+#          failIfNotFullyCacheable: false
+#          gitBranch: ${{ env.BRANCH }}

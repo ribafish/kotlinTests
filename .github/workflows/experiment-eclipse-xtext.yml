@@ -29,6 +29,8 @@ jobs:
         with:
           java-version: 21
           distribution: "temurin"
+      - name: Set Maven Home environment variable
+        run: echo "MAVEN_WRAPPER_HOME=$(./mvnw --version | grep "Maven home:" | cut -c 13-)" >> "$GITHUB_ENV"
       - name: Download latest version of the validation scripts
         uses: gradle/develocity-build-validation-scripts/.github/actions/maven/download@actions-stable
         with:
@@ -43,7 +45,7 @@ jobs:
         with:
           gitRepo: ${{ env.GIT_REPO }}
           goals: ${{ matrix.goals }}
-          args: ${{ env.ARGS }}
+          args: ${{ env.ARGS }} "-Dmaven.home=${{ env.MAVEN_WRAPPER_HOME }}"
           develocityUrl: ${{ env.DEVELOCITY_URL }}
           gitBranch: ${{ env.BRANCH }}
           failIfNotFullyCacheable: false
@@ -58,7 +60,7 @@ jobs:
         with:
           gitRepo: ${{ env.GIT_REPO }}
           goals: ${{ matrix.goals }}
-          args: ${{ env.ARGS }}
+          args: ${{ env.ARGS }} "-Dmaven.home=${{ env.MAVEN_WRAPPER_HOME }}"
           develocityUrl: ${{ env.DEVELOCITY_URL }}
           gitBranch: ${{ env.BRANCH }}
           failIfNotFullyCacheable: false

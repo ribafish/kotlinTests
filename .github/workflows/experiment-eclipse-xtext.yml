@@ -20,8 +20,8 @@ jobs:
         goals:
           - "install -DskipTests=true -Dscan.tag.skipTests"
           - "install"
-          - "verify -f org.eclipse.xtext.full.releng -B -fae -PuseJenkinsSnapshots -Pstrict-jdk-21"
-        experimentId: [1, 2]
+#          - "verify -f org.eclipse.xtext.full.releng -B -fae -PuseJenkinsSnapshots -Pstrict-jdk-21"
+        experiment: [01-validate-local-build-caching-same-location, 02-validate-local-build-caching-different-locations]
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK
@@ -31,38 +31,27 @@ jobs:
           distribution: "temurin"
       - name: Set Maven Home environment variable
         run: echo "MAVEN_WRAPPER_HOME=$(./mvnw --version | grep "Maven home:" | cut -c 13-)" >> "$GITHUB_ENV"
-      - name: Download latest version of the validation scripts
+      - name: Download the latest version of the validation scripts
         uses: gradle/develocity-build-validation-scripts/.github/actions/maven/download@actions-stable
         with:
           downloadDevelopmentRelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run experiment 1
-        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-1@actions-stable
-        if: matrix.experimentId == 1
+      - name: Set up Xvfb and run experiment ${{ matrix.experiment }}
         env:
-          DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
-          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+         DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+        shell: bash
+        working-directory: develocity-maven-build-validation
+        run: |
+         export DISPLAY=:99
+         sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+         ./${{ matrix.experiment }}.sh -r ${{ env.GIT_REPO }} -g "${{ matrix.goals }}" -a "${{ env.ARGS }}" -s ${{ env.DEVELOCITY_URL }} -b ${{ env.BRANCH }}
+      - name: Read summary from file and set GitHub Actions Summary
+        shell: bash
+        if: always()
+        run: cat develocity-maven-build-validation/.data/${{ matrix.experiment }}/latest/*.receipt >> $GITHUB_STEP_SUMMARY
+      - name: Publish Experiment Results
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          gitRepo: ${{ env.GIT_REPO }}
-          goals: ${{ matrix.goals }}
-          args: ${{ env.ARGS }} "-Dmaven.home=${{ env.MAVEN_WRAPPER_HOME }}"
-          develocityUrl: ${{ env.DEVELOCITY_URL }}
-          gitBranch: ${{ env.BRANCH }}
-          failIfNotFullyCacheable: false
-          enableDevelocity: false
-          enableGradleEnterprise: false
-      - name: Run experiment 2
-        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/experiment-2@actions-stable
-        if: matrix.experimentId == 2
-        env:
-          DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
-          GRADLE_ENTERPRISE_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
-        with:
-          gitRepo: ${{ env.GIT_REPO }}
-          goals: ${{ matrix.goals }}
-          args: ${{ env.ARGS }} "-Dmaven.home=${{ env.MAVEN_WRAPPER_HOME }}"
-          develocityUrl: ${{ env.DEVELOCITY_URL }}
-          gitBranch: ${{ env.BRANCH }}
-          failIfNotFullyCacheable: false
-          enableDevelocity: false
-          enableGradleEnterprise: false
+          path: 'develocity-maven-build-validation/.data/${{ matrix.experiment }}/latest/*.receipt'
+          name: ${{ matrix.experiment }} ${{ matrix.goals }}.receipt

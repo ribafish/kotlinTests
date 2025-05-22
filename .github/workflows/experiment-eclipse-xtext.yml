@@ -20,7 +20,7 @@ jobs:
         goals:
           - "install -DskipTests=true -Dscan.tag.skipTests"
           - "install"
-#          - "verify -f org.eclipse.xtext.full.releng -B -fae -PuseJenkinsSnapshots -Pstrict-jdk-21"
+          - "verify -f org.eclipse.xtext.full.releng -B -fae -PuseJenkinsSnapshots -Pstrict-jdk-21"
         experiment: [01-validate-local-build-caching-same-location, 02-validate-local-build-caching-different-locations]
     runs-on: ubuntu-latest
     steps:

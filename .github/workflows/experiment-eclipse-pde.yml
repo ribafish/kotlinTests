@@ -1,0 +1,61 @@
+name: Eclipse PDE BVS Experiment
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/experiment-eclipse-pde.yml"
+
+env:
+  DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
+  GIT_REPO: "https://github.com/ribafish/eclipse.pde.git"
+  BRANCH: "gk/develocity"
+  ARGS: "-Dscan.tag.gk-eclipse-exp"
+
+jobs:
+  exp:
+    strategy:
+      fail-fast: false
+      matrix:
+        goals:
+          - "install -DskipTests=true -Dscan.tag.skipTests"
+          - "install"
+          - "verify -Ptck -Dscan.tag.Ptck"
+          - "verify --fail-at-end --update-snapshots --batch-mode --no-transfer-progress --show-version --errors -Pbree-libs -Papi-check -Pjavadoc -Ptck -Dcompare-version-with-baselines.skip=false -Dmaven.test.failure.ignore=true -Dtycho.debug.artifactcomparator -Dpde.docs.baselinemode=fail"
+        experiment: [01-validate-local-build-caching-same-location, 02-validate-local-build-caching-different-locations]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: "temurin"
+
+      - name: Download the latest version of the validation scripts
+        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/download@actions-stable
+        with:
+          downloadDevelopmentRelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Xvfb and run experiment ${{ matrix.experiment }}
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+        shell: bash
+        working-directory: develocity-maven-build-validation
+        run: |
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          ./${{ matrix.experiment }}.sh -r ${{ env.GIT_REPO }} -g "${{ matrix.goals }}" -a "${{ env.ARGS }}" -s ${{ env.DEVELOCITY_URL }} -b ${{ env.BRANCH }}
+
+      - name: Read summary from file and set GitHub Actions Summary
+        shell: bash
+        if: always()
+        run: cat develocity-maven-build-validation/.data/${{ matrix.experiment }}/latest/*.receipt >> $GITHUB_STEP_SUMMARY
+
+      - name: Publish Experiment Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          path: 'develocity-maven-build-validation/.data/${{ matrix.experiment }}/latest/*.receipt'
+          name: ${{ matrix.experiment }} ${{ matrix.goals }}.receipt

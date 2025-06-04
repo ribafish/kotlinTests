@@ -1,4 +1,4 @@
-name: Eclipse ESCET BVS Experiment
+name: Eclipse MWE BVS Experiment
 
 on:
   workflow_dispatch:

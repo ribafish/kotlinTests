@@ -1,0 +1,61 @@
+name: Eclipse ESCET BVS Experiment
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/experiment-eclipse-mwe.yml"
+
+env:
+  DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
+  GIT_REPO: "https://github.com/ribafish/eclipse-mwe.git"
+  BRANCH: "gk/develocity"
+  ARGS: "-Dscan.tag.gk-eclipse-exp"
+
+jobs:
+  Experiment:
+    strategy:
+      fail-fast: false
+      matrix:
+        goals:
+          - "install -f maven/org.eclipse.emf.mwe2.parent/pom.xml -Dtycho.localArtifacts=ignore -Dmaven.repo.local=.m2/repository -DskipTests=true -Dscan.tag.skipTests"
+          - "install -f maven/org.eclipse.emf.mwe2.parent/pom.xml -Dtycho.localArtifacts=ignore -Dmaven.repo.local=.m2/repository "
+          - "deploy -e -f maven/org.eclipse.emf.mwe2.parent/pom.xml -Dtycho-version=4.0.10 -Dsign.skip=false -DtestFailureIgnore=true -Dmaven.javadoc.failOnError=false -Dtycho.localArtifacts=ignore -Dtarget-platform=org.eclipse.emf.mwe2.target -DBUILD_TYPE=N -Dscan.tag.target"
+          - "deploy -e -f maven/org.eclipse.emf.mwe2.parent/pom.xml -Dtycho-version=4.0.11 -Dsign.skip=false -DtestFailureIgnore=true -Dmaven.javadoc.failOnError=false -Dtycho.localArtifacts=ignore -Dtarget-platform=org.eclipse.emf.mwe2.target.nightly -DBUILD_TYPE=N -Dscan.tag.target.nightly"
+        experiment: [01-validate-local-build-caching-same-location, 02-validate-local-build-caching-different-locations]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: "temurin"
+
+      - name: Download the latest version of the validation scripts
+        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/download@actions-stable
+        with:
+          downloadDevelopmentRelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Xvfb and run experiment ${{ matrix.experiment }}
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+        shell: bash
+        working-directory: develocity-maven-build-validation
+        run: |
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          ./${{ matrix.experiment }}.sh -r ${{ env.GIT_REPO }} -g "${{ matrix.goals }}" -a "${{ env.ARGS }}" -s ${{ env.DEVELOCITY_URL }} -b ${{ env.BRANCH }}
+
+      - name: Read summary from file and set GitHub Actions Summary
+        shell: bash
+        if: always()
+        run: cat develocity-maven-build-validation/.data/${{ matrix.experiment }}/latest/*.receipt >> $GITHUB_STEP_SUMMARY
+
+      - name: Publish Experiment Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          path: 'develocity-maven-build-validation/.data/${{ matrix.experiment }}/latest/*.receipt'
+          name: ${{ matrix.experiment }} ${{ matrix.goals }}.receipt

@@ -13,7 +13,7 @@ env:
   ARGS: "-Dscan.tag.gk-eclipse-exp"
 
 jobs:
-  Experiment:
+  exp:
     strategy:
       fail-fast: false
       matrix:
@@ -22,6 +22,7 @@ jobs:
           - "install"
           - "verify -f org.eclipse.xtext.full.releng -B -fae -PuseJenkinsSnapshots -Pstrict-jdk-21 -Dscan.tag.full-releng"
           - "verify -f org.eclipse.xtext.maven.releng -B -fae -PuseJenkinsSnapshots -Pstrict-jdk-21 -Dscan.tag.maven-releng"
+          - "verify -f org.eclipse.xtext.full.releng -Dscan.tag.full-gk-fast-feedback -pl :org.eclipse.xtend.ide.swtbot.tests,:org.eclipse.xtend.ide,:org.eclipse.xtend.core,:org.eclipse.xtext.xtext.generator.dependencies,:org.eclipse.xtext.xtext.generator,:org.eclipse.xtext.ecore,:org.eclipse.xtext.xbase,:org.eclipse.xtext.xbase.ui,:org.eclipse.xtext.common.types.shared,:org.eclipse.xtext.xbase.ide,:org.eclipse.xtend.ide.common,:org.eclipse.xtext.ui.testing,:org.eclipse.xtext.builder.standalone,:org.eclipse.xtext.testing,:org.eclipse.xtext.common.types.shared.jdt38,:org.eclipse.xtext.logging -fae"
         experiment: [01-validate-local-build-caching-same-location, 02-validate-local-build-caching-different-locations]
     runs-on: ubuntu-latest
     steps:
@@ -30,13 +31,16 @@ jobs:
         with:
           java-version: 21
           distribution: "temurin"
+
       - name: Set Maven Home environment variable
         run: echo "MAVEN_WRAPPER_HOME=$(./mvnw --version | grep "Maven home:" | cut -c 13-)" >> "$GITHUB_ENV"
+
       - name: Download the latest version of the validation scripts
         uses: gradle/develocity-build-validation-scripts/.github/actions/maven/download@actions-stable
         with:
           downloadDevelopmentRelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set up Xvfb and run experiment ${{ matrix.experiment }}
         env:
          DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
@@ -46,10 +50,12 @@ jobs:
          export DISPLAY=:99
          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
          ./${{ matrix.experiment }}.sh -r ${{ env.GIT_REPO }} -g "${{ matrix.goals }}" -a "${{ env.ARGS }}" -s ${{ env.DEVELOCITY_URL }} -b ${{ env.BRANCH }}
+
       - name: Read summary from file and set GitHub Actions Summary
         shell: bash
         if: always()
         run: cat develocity-maven-build-validation/.data/${{ matrix.experiment }}/latest/*.receipt >> $GITHUB_STEP_SUMMARY
+
       - name: Publish Experiment Results
         if: always()
         uses: actions/upload-artifact@v4

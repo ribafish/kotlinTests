@@ -13,15 +13,15 @@ env:
   ARGS: "-Dscan.tag.gk-eclipse-exp"
 
 jobs:
-  Experiment:
+  exp:
     strategy:
       fail-fast: false
       matrix:
         goals:
           - "install -f maven/org.eclipse.emf.mwe2.parent/pom.xml -Dtycho.localArtifacts=ignore -Dmaven.repo.local=.m2/repository -DskipTests=true -Dscan.tag.skipTests"
           - "install -f maven/org.eclipse.emf.mwe2.parent/pom.xml -Dtycho.localArtifacts=ignore -Dmaven.repo.local=.m2/repository "
-          - "deploy -e -f maven/org.eclipse.emf.mwe2.parent/pom.xml -Dtycho-version=4.0.10 -Dsign.skip=false -DtestFailureIgnore=true -Dmaven.javadoc.failOnError=false -Dtycho.localArtifacts=ignore -Dtarget-platform=org.eclipse.emf.mwe2.target -DBUILD_TYPE=N -Dscan.tag.target"
-          - "deploy -e -f maven/org.eclipse.emf.mwe2.parent/pom.xml -Dtycho-version=4.0.11 -Dsign.skip=false -DtestFailureIgnore=true -Dmaven.javadoc.failOnError=false -Dtycho.localArtifacts=ignore -Dtarget-platform=org.eclipse.emf.mwe2.target.nightly -DBUILD_TYPE=N -Dscan.tag.target.nightly"
+          - "install -e -f maven/org.eclipse.emf.mwe2.parent/pom.xml -Dtycho-version=4.0.10 -Dsign.skip=false -DtestFailureIgnore=true -Dmaven.javadoc.failOnError=false -Dtycho.localArtifacts=ignore -Dtarget-platform=org.eclipse.emf.mwe2.target -DBUILD_TYPE=N -Dscan.tag.target=target"
+          - "install -e -f maven/org.eclipse.emf.mwe2.parent/pom.xml -Dtycho-version=4.0.11 -Dsign.skip=false -DtestFailureIgnore=true -Dmaven.javadoc.failOnError=false -Dtycho.localArtifacts=ignore -Dtarget-platform=org.eclipse.emf.mwe2.target.nightly -DBUILD_TYPE=N -Dscan.tag.target=target.nightly"
         experiment: [01-validate-local-build-caching-same-location, 02-validate-local-build-caching-different-locations]
     runs-on: ubuntu-latest
     timeout-minutes: 60

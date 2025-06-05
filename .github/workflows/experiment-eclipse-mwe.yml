@@ -52,10 +52,3 @@ jobs:
         shell: bash
         if: always()
         run: cat develocity-maven-build-validation/.data/${{ matrix.experiment }}/latest/*.receipt >> $GITHUB_STEP_SUMMARY
-
-      - name: Publish Experiment Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          path: 'develocity-maven-build-validation/.data/${{ matrix.experiment }}/latest/*.receipt'
-          name: ${{ matrix.experiment }} ${{ matrix.goals }}.receipt

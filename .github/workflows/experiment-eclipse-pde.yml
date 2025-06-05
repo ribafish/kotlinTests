@@ -69,6 +69,8 @@ jobs:
           - "verify -Ptck -Dscan.tag.Ptck"
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -88,16 +90,20 @@ jobs:
           java-version: 21
           distribution: "temurin"
 
-      - name: Setp Xvfb
+      - name: Run Build 1
         run: |
           export DISPLAY=:99
           sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
-
-      - name: Run Build 1
-        run: mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b1
+          mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b1
 
       - name: Run Build 2
-        run: mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b2
+        run: |
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b2
 
       - name: Run Build 3
-        run: mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b3
+        run: |
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b3

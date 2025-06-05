@@ -73,7 +73,7 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
         with:
-          repository: "https://github.com/ribafish/eclipse.pde.git"
+          repository: "ribafish/eclipse.pde"
           ref: "gk/develocity"
 
       - name: Set up JDK 17

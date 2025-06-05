@@ -94,10 +94,10 @@ jobs:
           sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
 
       - name: Run Build 1
-        run: mvn clean ${{ matrix.goals }} -Dscan.tag.gk-exp2-b1
+        run: mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b1
 
       - name: Run Build 2
-        run: mvn clean ${{ matrix.goals }} -Dscan.tag.gk-exp2-b2
+        run: mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b2
 
       - name: Run Build 3
-        run: mvn clean ${{ matrix.goals }} -Dscan.tag.gk-exp2-b3
+        run: mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b3

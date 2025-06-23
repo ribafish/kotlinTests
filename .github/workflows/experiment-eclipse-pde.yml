@@ -94,16 +94,16 @@ jobs:
         run: |
           export DISPLAY=:99
           sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
-          mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b1
+          mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Ddevelocity.scan.uploadInBackground=false -Dscan.tag.gk-exp2-b1
 
       - name: Run Build 2
         run: |
           export DISPLAY=:99
           sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
-          mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b2
+          mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Ddevelocity.scan.uploadInBackground=false -Dscan.tag.gk-exp2-b2
 
       - name: Run Build 3
         run: |
           export DISPLAY=:99
           sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
-          mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Dscan.tag.gk-exp2-b3
+          mvn clean ${{ matrix.goals }} -Ddevelocity.url=https://ge.solutions-team.gradle.com/ -Ddevelocity.scan.uploadInBackground=false -Dscan.tag.gk-exp2-b3

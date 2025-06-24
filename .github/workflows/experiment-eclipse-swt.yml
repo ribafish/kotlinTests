@@ -23,7 +23,7 @@ jobs:
           - "verify"
           - "verify -Dscan.tag.profiles --batch-mode --threads 1C -V -U -e -Pbree-libs -Papi-check -Pjavadoc -Dcompare-version-with-baselines.skip=false -Dorg.eclipse.swt.tests.junit.disable.test_isLocal=true -Dmaven.test.failure.ignore=false -Dmaven.test.error.ignore=false"
         experiment: [ 01-validate-local-build-caching-same-location, 02-validate-local-build-caching-different-locations ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
     steps:
       - name: Set up JDK 17

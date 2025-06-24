@@ -19,9 +19,10 @@ jobs:
       matrix:
         goals:
           - "install -DskipTests=true -Dscan.tag.skipTests"
-          - "install"
-          - "verify"
-          - "verify -Dscan.tag.profiles --batch-mode --threads 1C -V -U -e -Pbree-libs -Papi-check -Pjavadoc -Dcompare-version-with-baselines.skip=false -Dorg.eclipse.swt.tests.junit.disable.test_isLocal=true -Dmaven.test.failure.ignore=false -Dmaven.test.error.ignore=false"
+          - "install -Dcompare-version-with-baselines.skip=true"
+          - "verify -Dcompare-version-with-baselines.skip=true"
+          - "verify -Dscan.tag.profiles --batch-mode --threads 1C -V -U -e -Pbree-libs -Papi-check -Pjavadoc -Dcompare-version-with-baselines.skip=true -Dorg.eclipse.swt.tests.junit.disable.test_isLocal=true -Dmaven.test.failure.ignore=false -Dmaven.test.error.ignore=false"
+          - "verify -Dscan.tag.failureIgnore --batch-mode --threads 1C -V -U -e -Pbree-libs -Papi-check -Pjavadoc -Dcompare-version-with-baselines.skip=true -Dorg.eclipse.swt.tests.junit.disable.test_isLocal=true -Dmaven.test.failure.ignore=true -Dmaven.test.error.ignore=true"
         experiment: [ 01-validate-local-build-caching-same-location, 02-validate-local-build-caching-different-locations ]
     runs-on: ubuntu-22.04
     timeout-minutes: 60

@@ -8,7 +8,7 @@ on:
 
 env:
   DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
-  GIT_REPO: "https://github.com/ribafish/eclipse.platform.swt.git"
+  GIT_REPO: "https://github.com/ribafish/eclipse.jdt.core.git"
   BRANCH: "feature/develocity"
   ARGS: "-Dscan.tag.gk-eclipse-exp"
 

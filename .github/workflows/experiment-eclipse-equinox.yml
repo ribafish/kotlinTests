@@ -21,6 +21,8 @@ jobs:
           - "install -DskipTests=true -Dscan.tag.skipTests"
           - "verify --batch-mode -Pbree-libs -Papi-check -Dcompare-version-with-baselines.skip=false -Dmaven.test.failure.ignore=false -Dnative=gtk.linux.x86_64 -Dequinox.binaries.loc=${{ github.workspace }}/equinox.binaries"
           - "verify -Dscan.tag.tck -U --batch-mode --threads 1C -Pbuild-individual-bundles -Pbree-libs -Ptck -Dskip-default-modules=true -Dtycho.resolver.classic=false -fn"
+          - "verify --fail-never -Dscan.tag.failNever--batch-mode -Pbree-libs -Papi-check -Dcompare-version-with-baselines.skip=false -Dmaven.test.failure.ignore=false -Dnative=gtk.linux.x86_64 -Dequinox.binaries.loc=${{ github.workspace }}/equinox.binaries"
+          - "verify -Dscan.tag.tck --fail-never -Dscan.tag.failNever  -U --batch-mode --threads 1C -Pbuild-individual-bundles -Pbree-libs -Ptck -Dskip-default-modules=true -Dtycho.resolver.classic=false -fn"
         experiment: [ 01-validate-local-build-caching-same-location, 02-validate-local-build-caching-different-locations ]
     runs-on: ubuntu-latest
     steps:

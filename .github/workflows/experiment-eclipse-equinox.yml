@@ -1,0 +1,80 @@
+name: Eclipse Equinox BVS Experiment
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/experiment-eclipse-equinox.yml"
+
+env:
+  DEVELOCITY_URL: "https://ge.solutions-team.gradle.com"
+  GIT_REPO: "ribafish/eclipse-equinox"
+  BRANCH: "feature/develocity"
+  ARGS: "-Dscan.tag.gk-eclipse-exp"
+
+jobs:
+  Experiment:
+    strategy:
+      fail-fast: false
+      matrix:
+        goals:
+          - "install -DskipTests=true -Dscan.tag.skipTests"
+          - "verify --batch-mode -Pbree-libs -Papi-check -Dcompare-version-with-baselines.skip=false -Dmaven.test.failure.ignore=false -Dnative=gtk.linux.x86_64 -Dequinox.binaries.loc=${{ github.workspace }}/equinox.binaries"
+          - "verify -Dscan.tag.tck -U --batch-mode --threads 1C -Pbuild-individual-bundles -Pbree-libs -Ptck -Dskip-default-modules=true -Dtycho.resolver.classic=false -fn"
+        experiment: [ 01-validate-local-build-caching-same-location, 02-validate-local-build-caching-different-locations ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # required for jgit timestamp provider to work
+          repository: ${{ env.GIT_REPO }}
+          path: equinox
+      - name: checkout equinox.binaries
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # only shallow here, we don't have jgit timestamps
+          repository: eclipse-equinox/equinox.binaries
+          path: equinox.binaries
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: |
+            8
+            17
+            21
+          mvn-toolchain-id: |
+            JavaSE-1.8
+            JavaSE-17
+            JavaSE-21
+          distribution: 'temurin'
+          cache: maven
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.10
+      - name: Install GTK requirements
+        run: |
+          sudo apt-get update -q -y 
+          sudo apt-get install -q -y libgtk-3-dev 
+
+      - name: Download the latest version of the validation scripts
+        uses: gradle/develocity-build-validation-scripts/.github/actions/maven/download@actions-stable
+        with:
+          downloadDevelopmentRelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Xvfb and run experiment ${{ matrix.experiment }}
+        env:
+          DEVELOCITY_ACCESS_KEY: "${{ secrets.GE_SOLUTIONS_ACCESS_TOKEN }}"
+          EQUINOX_BINARIES_LOC: ${{ github.workspace }}/equinox.binaries
+        shell: bash
+        working-directory: develocity-maven-build-validation
+        run: |
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          ./${{ matrix.experiment }}.sh -r ${{ github.workspace }}/equinox -g "${{ matrix.goals }}" -a "${{ env.ARGS }}" -s ${{ env.DEVELOCITY_URL }} -b ${{ env.BRANCH }}
+
+      - name: Read summary from file and set GitHub Actions Summary
+        shell: bash
+        if: always()
+        run: cat develocity-maven-build-validation/.data/${{ matrix.experiment }}/latest/*.receipt >> $GITHUB_STEP_SUMMARY

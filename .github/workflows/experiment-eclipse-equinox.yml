@@ -28,6 +28,7 @@ jobs:
         with:
           fetch-depth: 0 # required for jgit timestamp provider to work
           repository: ${{ env.GIT_REPO }}
+          ref: ${{ env.BRANCH }}
           path: equinox
       - name: checkout equinox.binaries
         uses: actions/checkout@v4
@@ -72,7 +73,7 @@ jobs:
         run: |
           export DISPLAY=:99
           sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
-          ./${{ matrix.experiment }}.sh -r ${{ github.workspace }}/equinox -g "${{ matrix.goals }}" -a "${{ env.ARGS }}" -s ${{ env.DEVELOCITY_URL }} -b ${{ env.BRANCH }}
+          ./${{ matrix.experiment }}.sh -r ${{ github.workspace }}/equinox -g "${{ matrix.goals }}" -a "${{ env.ARGS }}" -s ${{ env.DEVELOCITY_URL }}
 
       - name: Read summary from file and set GitHub Actions Summary
         shell: bash
